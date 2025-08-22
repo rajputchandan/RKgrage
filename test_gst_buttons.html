@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GST Billing Buttons Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .button-container {
+            display: flex;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .btn-primary {
+            background-color: #1976d2;
+            color: white;
+        }
+        .btn-secondary {
+            background-color: #9c27b0;
+            color: white;
+        }
+        .btn:hover {
+            opacity: 0.8;
+        }
+        .info-box {
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .gst-info {
+            background-color: #e8f5e8;
+            border: 2px solid #4caf50;
+            color: #2e7d32;
+        }
+        .no-gst-info {
+            background-color: #fff3e0;
+            border: 2px solid #ff9800;
+            color: #f57c00;
+        }
+    </style>
+</head>
+<body>
+    <h1>GST Billing Implementation Test</h1>
+    
+    <h2>Main Billing Interface</h2>
+    <p>These buttons should appear on the main billing page:</p>
+    
+    <div class="button-container">
+        <button class="btn btn-primary" onclick="openGSTBill()">
+            ➕ Create Bill (With GST)
+        </button>
+        <button class="btn btn-secondary" onclick="openNoGSTBill()">
+            ➕ Create Bill (No GST)
+        </button>
+    </div>
+    
+    <h2>Dialog Examples</h2>
+    
+    <h3>With GST Selected:</h3>
+    <div class="info-box gst-info">
+        <h4>✓ GST Bill Selected</h4>
+        <p>This bill will include 9% CGST + 9% SGST = 18% total GST</p>
+        <p><em>To change GST option, close this dialog and click the other button.</em></p>
+    </div>
+    
+    <h3>No GST Selected:</h3>
+    <div class="info-box no-gst-info">
+        <h4>✓ Non-GST Bill Selected</h4>
+        <p>This bill will not include any GST charges</p>
+        <p><em>To change GST option, close this dialog and click the other button.</em></p>
+    </div>
+    
+    <h2>Implementation Summary</h2>
+    <ul>
+        <li><strong>Main Page:</strong> Two separate buttons for creating bills</li>
+        <li><strong>Dialog Title:</strong> Shows "Create New Bill (With GST)" or "Create New Bill (No GST)"</li>
+        <li><strong>Info Section:</strong> Clear indication of selected GST option</li>
+        <li><strong>Submit Button:</strong> Changes color and text based on GST option</li>
+        <li><strong>Backend:</strong> Receives gst_enabled flag and processes accordingly</li>
+    </ul>
+    
+    <h2>Expected Behavior</h2>
+    <ol>
+        <li>User sees two buttons on main billing page</li>
+        <li>Clicking "Create Bill (With GST)" opens dialog with GST enabled</li>
+        <li>Clicking "Create Bill (No GST)" opens dialog with GST disabled</li>
+        <li>Dialog shows clear indication of selected option</li>
+        <li>Submit button reflects the chosen option</li>
+        <li>Backend creates bill with appropriate GST settings</li>
+    </ol>
+
+    <script>
+        function openGSTBill() {
+            alert('Opening dialog for GST bill creation...\n\nDialog Title: "Create New Bill (With GST)"\nGST Status: Enabled\nSubmit Button: "Create Bill (With GST)"');
+        }
+        
+        function openNoGSTBill() {
+            alert('Opening dialog for No-GST bill creation...\n\nDialog Title: "Create New Bill (No GST)"\nGST Status: Disabled\nSubmit Button: "Create Bill (No GST)"');
+        }
+    </script>
+</body>
+</html>
