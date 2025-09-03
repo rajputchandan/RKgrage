@@ -590,22 +590,22 @@ const handleSubmit = async () => {
             <Grid container spacing={2}>
               {/* Customer Selection */}
               <Grid item xs={12} sm={6}>
-                <FormControl fullWidth>
-                  <InputLabel>Customer</InputLabel>
-                  <Select
-                    value={formData.customer_id}
-                    onChange={(e) => setFormData({ ...formData, customer_id: e.target.value })}
-                    label="Customer"
-                    required
-                      disabled={!!editingJobCard}
-                  >
-                    {customers.map((customer) => (
-                      <MenuItem key={customer._id} value={customer._id}>
-                        {customer.first_name} {customer.last_name} - {customer.phone}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
+              <FormControl fullWidth disabled={!!editingJobCard}>
+  <InputLabel>Customer</InputLabel>
+  <Select
+    value={formData.customer_id}
+    onChange={(e) => setFormData({ ...formData, customer_id: e.target.value })}
+    label="Customer"
+    required
+  >
+    {customers.map((customer) => (
+      <MenuItem key={customer._id} value={customer._id}>
+        {customer.first_name} {customer.last_name} - {customer.phone}
+      </MenuItem>
+    ))}
+  </Select>
+</FormControl>
+
               </Grid>
 
               {/* Service Type */}
