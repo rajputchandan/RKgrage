@@ -590,14 +590,16 @@ const handleSubmit = async () => {
             <Grid container spacing={2}>
               {/* Customer Selection */}
               <Grid item xs={12} sm={6}>
-     <FormControl fullWidth>
+            <FormControl fullWidth>
   <InputLabel id="customer-select-label">Customer</InputLabel>
   <Select
     labelId="customer-select-label"
     id="customer-select"
     value={formData.customer_id}
     onChange={(e) => setFormData({ ...formData, customer_id: e.target.value })}
-    disabled={Boolean(editingJobCard)}
+    label="Customer"
+    required
+    disabled={Boolean(editingJobCard)}   // 👈 direct yahan
   >
     {customers.map((customer) => (
       <MenuItem key={customer._id} value={customer._id}>
