@@ -145,6 +145,8 @@ const JobCards = () => {
       setLoading(false);
     }
   };
+  // calculation of labor and total
+  
 
   const fetchCustomers = async () => {
     try {
@@ -172,7 +174,8 @@ const JobCards = () => {
     if (jobCard) {
       setEditingJobCard(jobCard);
       setFormData({
-        customer_id: jobCard.customer_id || '',
+      customer_id: jobCard.customer_id?._id || jobCard.customer_id || '',
+
         service_type: jobCard.service_type || '',
         complaint: jobCard.complaint || '',
         discount: jobCard.discount || '',
@@ -208,85 +211,98 @@ const JobCards = () => {
     setLaborEntries([]);
   };
 
-  const handleSubmit = async () => {
-    try {
-      if (editingJobCard) {
-        // For updates, separate general updates from parts updates
-        const generalUpdateData = {
-          ...formData,
-          labor_entries: laborEntries,
-          discount: Number(formData.discount) || 0
-        };
+const handleSubmit = async () => {
+  try {
+    // 👇 Calculate grand total from parts + labor - discount
+    const calculateTotalAmount = () => {
+      const partsTotal = selectedParts.reduce((sum, part) => sum + (part.total_price || 0), 0);
+      const laborTotal = laborEntries.reduce((sum, labor) => sum + (Number(labor.total_amount) || 0), 0);
+      const discount = Number(formData.discount) || 0;
+      return partsTotal + laborTotal - discount;
+    };
 
-        // First, update general job card data (excluding parts)
-        const generalResponse = await axios.put(`/api/jobcards/update/${editingJobCard.id}`, generalUpdateData);
+    const totalAmount = calculateTotalAmount();
+
+    if (editingJobCard) {
+      // For updates, separate general updates from parts updates
+      const generalUpdateData = {
+        ...formData,
+        labor_entries: laborEntries,
+        discount: Number(formData.discount) || 0,
+        total_amount: totalAmount,   // 👈 added here
+      };
+
+      // First, update general job card data (excluding parts)
+      const generalResponse = await axios.put(`/api/jobcards/update/${editingJobCard.id}`, generalUpdateData);
+      
+      if (generalResponse.data.success) {
+        // Check if parts have changed
+        const originalParts = editingJobCard.parts_used || [];
+        const currentParts = selectedParts;
         
-        if (generalResponse.data.success) {
-          // Check if parts have changed
-          const originalParts = editingJobCard.parts_used || [];
-          const currentParts = selectedParts;
-          
-          // Simple comparison - if lengths differ or any part is different, update parts
-          const partsChanged = originalParts.length !== currentParts.length ||
-            !originalParts.every((origPart, index) => {
-              const currPart = currentParts[index];
-              return currPart &&
-                     (origPart.part_id === currPart.part_id || origPart.part_id === currPart._id) &&
-                     origPart.quantity === currPart.quantity;
-            });
+        // Simple comparison - if lengths differ or any part is different, update parts
+        const partsChanged = originalParts.length !== currentParts.length ||
+          !originalParts.every((origPart, index) => {
+            const currPart = currentParts[index];
+            return currPart &&
+                   (origPart.part_id === currPart.part_id || origPart.part_id === currPart._id) &&
+                   origPart.quantity === currPart.quantity;
+          });
 
-          if (partsChanged) {
-            console.log('Parts have changed, updating parts separately...');
-            // Update parts separately using the new endpoint with 'edit' mode
-            const partsData = {
-              parts_used: selectedParts.map(part => ({
-                part_id: part.part_id || part._id,
-                part_name: part.part_name,
-                part_number: part.part_number,
-                quantity: part.quantity,
-                unit_price: part.unit_price,
-                total_price: part.total_price
-              })),
-              update_mode: 'edit' // Use edit mode to only subtract new/increased parts from inventory
-            };
+        if (partsChanged) {
+          console.log('Parts have changed, updating parts separately...');
+          // Update parts separately using the new endpoint with 'edit' mode
+          const partsData = {
+            parts_used: selectedParts.map(part => ({
+              part_id: part.part_id || part._id,
+              part_name: part.part_name,
+              part_number: part.part_number,
+              quantity: part.quantity,
+              unit_price: part.unit_price,
+              total_price: part.total_price
+            })),
+            update_mode: 'edit' // Use edit mode to only subtract new/increased parts from inventory
+          };
 
-            const partsResponse = await axios.put(`/api/jobcards/update-parts/${editingJobCard.id}`, partsData);
-            if (partsResponse.data.success) {
-              setSnackbar({ open: true, message: 'Job card and parts updated successfully!', severity: 'success' });
-            }
-          } else {
-            setSnackbar({ open: true, message: 'Job card updated successfully!', severity: 'success' });
+          const partsResponse = await axios.put(`/api/jobcards/update-parts/${editingJobCard.id}`, partsData);
+          if (partsResponse.data.success) {
+            setSnackbar({ open: true, message: 'Job card and parts updated successfully!', severity: 'success' });
           }
-        }
-      } else {
-        // For creation, send everything together as before
-        const submitData = {
-          ...formData,
-          labor_entries: laborEntries,
-          discount: Number(formData.discount) || 0,
-          parts_used: selectedParts.map(part => ({
-            part_id: part.part_id || part._id,
-            quantity: part.quantity
-          }))
-        };
-
-        const response = await axios.post('/api/jobcards/create', submitData);
-        if (response.data.success) {
-          setSnackbar({ open: true, message: 'Job card created successfully!', severity: 'success' });
+        } else {
+          setSnackbar({ open: true, message: 'Job card updated successfully!', severity: 'success' });
         }
       }
-      
-      handleCloseDialog();
-      fetchJobCards();
-    } catch (error) {
-      console.error('Submit error:', error);
-      setSnackbar({
-        open: true,
-        message: error.response?.data?.message || 'Operation failed',
-        severity: 'error'
-      });
+    } else {
+      // For creation, send everything together as before
+      const submitData = {
+        ...formData,
+        labor_entries: laborEntries,
+        discount: Number(formData.discount) || 0,
+        parts_used: selectedParts.map(part => ({
+          part_id: part.part_id || part._id,
+          quantity: part.quantity
+        })),
+        total_amount: totalAmount,   // 👈 added here
+      };
+
+      const response = await axios.post('/api/jobcards/create', submitData);
+      if (response.data.success) {
+        setSnackbar({ open: true, message: 'Job card created successfully!', severity: 'success' });
+      }
     }
-  };
+    
+    handleCloseDialog();
+    fetchJobCards();
+  } catch (error) {
+    console.error('Submit error:', error);
+    setSnackbar({
+      open: true,
+      message: error.response?.data?.message || 'Operation failed',
+      severity: 'error'
+    });
+  }
+};
+
 
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this job card?')) {
@@ -581,6 +597,7 @@ const JobCards = () => {
                     onChange={(e) => setFormData({ ...formData, customer_id: e.target.value })}
                     label="Customer"
                     required
+                      disabled={!!editingJobCard}
                   >
                     {customers.map((customer) => (
                       <MenuItem key={customer._id} value={customer._id}>

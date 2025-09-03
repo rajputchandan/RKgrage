@@ -95,24 +95,25 @@ const jobCardSchema = new mongoose.Schema({
 jobCardSchema.pre('save', function(next) {
   // Calculate parts total
   this.parts_total = this.parts_used.reduce((total, part) => total + (part.total_price || 0), 0);
-  
-  // Calculate labor total from multiple labor entries, fallback to old labor_charges for backward compatibility
+
+  // Calculate labor total
   if (this.labor_entries && this.labor_entries.length > 0) {
     this.labor_total = this.labor_entries.reduce((total, labor) => total + (labor.total_amount || 0), 0);
   } else {
     this.labor_total = this.labor_charges || 0;
   }
-  
-  // Calculate subtotal
+
+  // Subtotal (without GST)
   this.subtotal = this.parts_total + this.labor_total;
-  
-  // Calculate GST (18% on subtotal)
-  this.gst_amount = Math.round((this.subtotal * 18) / 100);
-  
-  // Calculate total amount (subtotal + GST - discount)
-  this.total_amount = this.subtotal + this.gst_amount - (this.discount || 0);
-  
+
+  // GST disable
+  this.gst_amount = 0;
+
+  // Final total = subtotal - discount
+  this.total_amount = this.subtotal - (this.discount || 0);
+
   next();
 });
+
 
 module.exports = mongoose.model('JobCard', jobCardSchema);
