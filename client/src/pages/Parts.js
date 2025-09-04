@@ -469,12 +469,36 @@ const Parts = () => {
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                     label="Category"
                   >
-                    <MenuItem value="Brakes">Brakes</MenuItem>
                     <MenuItem value="Engine">Engine</MenuItem>
-                    <MenuItem value="Exterior">Exterior</MenuItem>
-                    <MenuItem value="Interior">Interior</MenuItem>
-                    <MenuItem value="Suspension">Suspension</MenuItem>
                     <MenuItem value="Electrical">Electrical</MenuItem>
+                    <MenuItem value="Suspension">Suspension</MenuItem>
+                    <MenuItem value="Brakes">Brakes</MenuItem>
+                    <MenuItem value="Transmission">Transmission</MenuItem>
+                    <MenuItem value="Exhaust">Exhaust</MenuItem>
+                    <MenuItem value="Cooling">Cooling</MenuItem>
+                    <MenuItem value="Body">Body</MenuItem>
+                    <MenuItem value="Interior">Interior</MenuItem>
+                    <MenuItem value="Filters">Filters</MenuItem>
+                    <MenuItem value="Fuel">Fuel</MenuItem>
+                    <MenuItem value="Tools">Tools</MenuItem>
+                    <MenuItem value="Lighting">Lighting</MenuItem>
+                    <MenuItem value="Battery">Battery</MenuItem>
+                    <MenuItem value="Tyres">Tyres</MenuItem>
+                    <MenuItem value="Wheels">Wheels</MenuItem>
+                    <MenuItem value="Steering">Steering</MenuItem>
+                    <MenuItem value="Clutch">Clutch</MenuItem>
+                    <MenuItem value="Radiator">Radiator</MenuItem>
+                    <MenuItem value="Mirrors">Mirrors</MenuItem>
+                    <MenuItem value="Bumpers">Bumpers</MenuItem>
+                    <MenuItem value="Seats">Seats</MenuItem>
+                    <MenuItem value="Mats">Mats</MenuItem>
+                    <MenuItem value="Dashboard">Dashboard</MenuItem>
+                    <MenuItem value="Wiring">Wiring</MenuItem>
+                    <MenuItem value="Oils">Oils</MenuItem>
+                    <MenuItem value="Belts">Belts</MenuItem>
+                    <MenuItem value="Horn">Horn</MenuItem>
+                    <MenuItem value="Glass">Glass</MenuItem>
+                    <MenuItem value="Paint">Paint</MenuItem>
                   </Select>
                 </FormControl>
               </Grid>
