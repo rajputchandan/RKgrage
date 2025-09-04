@@ -172,20 +172,17 @@ const JobCards = () => {
 
   const handleOpenDialog = (jobCard = null) => {
     if (jobCard) {
-      setEditingJobCard(jobCard);
-      setFormData({
-      customer_id: jobCard.customer_id?._id || jobCard.customer_id || '',
-
-        service_type: jobCard.service_type || '',
-        complaint: jobCard.complaint || '',
-        discount: jobCard.discount || '',
-        mechanic_assigned: jobCard.mechanic_assigned || '',
-        notes: jobCard.notes || '',
-        priority: jobCard.priority || 'Medium',
-        estimated_completion: jobCard.estimated_completion ? jobCard.estimated_completion.split('T')[0] : ''
-      });
-      setSelectedParts(jobCard.parts_used || []);
-      setLaborEntries(jobCard.labor_entries || []);
+      // Ensure customers are loaded before editing
+      if (customers.length === 0) {
+        console.log('Customers not loaded yet, fetching customers...');
+        fetchCustomers().then(() => {
+          // After customers are loaded, proceed with opening dialog
+          openDialogWithJobCard(jobCard);
+        });
+        return;
+      }
+      
+      openDialogWithJobCard(jobCard);
     } else {
       setEditingJobCard(null);
       setFormData({
@@ -200,7 +197,38 @@ const JobCards = () => {
       });
       setSelectedParts([]);
       setLaborEntries([]);
+      setOpenDialog(true);
     }
+  };
+
+  const openDialogWithJobCard = (jobCard) => {
+    setEditingJobCard(jobCard);
+    // Extract customer ID more robustly
+    const customerId =
+      jobCard.customer_id?._id ||
+      (typeof jobCard.customer_id === 'object' && jobCard.customer_id?.id) ||
+      (typeof jobCard.customer_id === 'string' && jobCard.customer_id) ||
+      '';
+    
+    // Verify that the customer exists in our customers array
+    const matchedCustomer = customers.find(c => c._id === customerId);
+    if (!matchedCustomer) {
+      console.warn('Customer not found in customers list for job card:', jobCard);
+    }
+    
+    setFormData({
+    customer_id: customerId,
+
+      service_type: jobCard.service_type || '',
+      complaint: jobCard.complaint || '',
+      discount: jobCard.discount || '',
+      mechanic_assigned: jobCard.mechanic_assigned || '',
+      notes: jobCard.notes || '',
+      priority: jobCard.priority || 'Medium',
+      estimated_completion: jobCard.estimated_completion ? jobCard.estimated_completion.split('T')[0] : ''
+    });
+    setSelectedParts(jobCard.parts_used || []);
+    setLaborEntries(jobCard.labor_entries || []);
     setOpenDialog(true);
   };
 
