@@ -618,26 +618,42 @@ const handleSubmit = async () => {
             <Grid container spacing={2}>
               {/* Customer Selection */}
               <Grid item xs={12} sm={6}>
-            <FormControl fullWidth>
-  <InputLabel id="customer-select-label">Customer</InputLabel>
-  <Select
-    labelId="customer-select-label"
-    id="customer-select"
-    value={formData.customer_id}
-    onChange={(e) => setFormData({ ...formData, customer_id: e.target.value })}
-    label="Customer"
-    required
-    disabled={Boolean(editingJobCard)}   // 👈 direct yahan
-  >
-    {customers.map((customer) => (
-      <MenuItem key={customer._id} value={customer._id}>
-        {customer.first_name} {customer.last_name} - {customer.phone}
-      </MenuItem>
-    ))}
-  </Select>
-</FormControl>
-
-
+                {editingJobCard ? (
+                  // Display customer name as read-only when editing
+                  <TextField
+                    fullWidth
+                    label="Customer"
+                    value={
+                      customers.find(c => c._id === formData.customer_id)
+                        ? `${customers.find(c => c._id === formData.customer_id).first_name} ${customers.find(c => c._id === formData.customer_id).last_name}`
+                        : 'Unknown Customer'
+                    }
+                    InputProps={{
+                      readOnly: true,
+                    }}
+                    variant="outlined"
+                    required
+                  />
+                ) : (
+                  // Show customer selection when creating new job card
+                  <FormControl fullWidth>
+                    <InputLabel id="customer-select-label">Customer</InputLabel>
+                    <Select
+                      labelId="customer-select-label"
+                      id="customer-select"
+                      value={formData.customer_id}
+                      onChange={(e) => setFormData({ ...formData, customer_id: e.target.value })}
+                      label="Customer"
+                      required
+                    >
+                      {customers.map((customer) => (
+                        <MenuItem key={customer._id} value={customer._id}>
+                          {customer.first_name} {customer.last_name} - {customer.phone}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                )}
               </Grid>
 
               {/* Service Type */}
